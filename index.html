@@ -8,26 +8,32 @@
 <meta name="apple-mobile-web-app-title" content="Execute">
 <meta name="theme-color" content="#080806">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Execute — Unlimited Custom Tracker</title>
+<title>Execute — Unlimited Tracker</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{height:100%;background:#080806;}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Helvetica,Arial,sans-serif;background:#080806;color:#f0ebe0;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#080806;color:#f0ebe0;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
 :root{--red:#e8401c;--green:#2ecc71;--orange:#f5a623;--blue:#3498db;--purple:#9b59b6;--muted:rgba(240,235,224,0.35);--border:rgba(255,255,255,0.08);--card:rgba(255,255,255,0.05);--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);}
+
+/* Splash */
 #splash{position:fixed;inset:0;z-index:999;background:#080806;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s ease;}
 #splash.hide{opacity:0;pointer-events:none;}
 .splash-icon{font-size:72px;animation:pulse 1.5s ease infinite;}
 .splash-title{font-size:48px;font-weight:900;background:linear-gradient(135deg,#f0ebe0 0%,#e8401c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* Perfect Day overlay */
 #perfect{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.92);flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 #perfect.show{display:flex;}
 .perf-ico{font-size:80px;animation:pulse 1s ease infinite;}
 .perf-title{font-size:56px;font-weight:900;background:linear-gradient(135deg,#f5a623,#e8401c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .perf-close{margin-top:16px;padding:14px 40px;background:var(--red);border:none;border-radius:30px;color:white;font-size:15px;font-weight:700;cursor:pointer;}
+
+/* Header */
 #header{flex-shrink:0;padding:calc(var(--safe-top) + 12px) 16px 12px;background:linear-gradient(180deg,rgba(232,64,28,0.1) 0%,transparent 100%);border-bottom:1px solid var(--border);}
 .hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .hdr-date{font-size:20px;font-weight:800;}
-.edit-btn{background:rgba(232,64,28,0.2);border:1px solid var(--red);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;}
+.hdr-right{display:flex;gap:8px;align-items:center;}
+.edit-btn{background:rgba(232,64,28,0.2);border:1px solid var(--red);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;transition:all .2s;}
 .edit-btn.active{background:var(--red);color:white;}
 .radial{position:relative;width:50px;height:50px;}
 .radial svg{width:50px;height:50px;transform:rotate(-90deg);}
@@ -37,35 +43,62 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',He
 .xp-val{font-size:12px;font-weight:700;color:var(--orange);}
 .xp-track{height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
 .xp-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:2px;transition:width .3s;}
+
+/* Nav */
 #nav{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(8,8,6,0.92);backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:100;padding-bottom:var(--safe-bot);}
 .nav-btn{background:none;border:none;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-top:2px solid transparent;}
 .nav-btn.active{border-top-color:var(--red);}
 .nav-ico{font-size:16px;}
 .nav-lbl{font-family:monospace;font-size:6px;color:var(--muted);}
 .nav-btn.active .nav-lbl{color:var(--red);}
+
+/* Content */
 #content{flex:1;overflow-y:auto;padding-bottom:calc(var(--safe-bot) + 70px);}
 .tab-pane{display:none;padding:16px;}
 .tab-pane.active{display:block;}
 .sec-lbl{font-family:monospace;font-size:9px;color:var(--muted);letter-spacing:3px;margin-bottom:12px;}
-.habit-card{display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);border-left:3px solid rgba(255,255,255,0.1);background:var(--card);cursor:pointer;transition:all .2s;}
-.habit-card.edit-mode{cursor:default;}
+
+/* Habit cards */
+.habit-card{display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);border-left:3px solid rgba(255,255,255,0.1);background:var(--card);transition:all .2s;}
+.habit-card:not(.edit-mode-card){cursor:pointer;}
 .habit-card.done{background:rgba(255,255,255,0.07);}
-.hc-check{width:20px;height:20px;border-radius:6px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
-.hc-ico{font-size:18px;}
-.hc-body{flex:1;}
+.hc-check{width:20px;height:20px;border-radius:6px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.hc-ico{font-size:18px;flex-shrink:0;}
+.hc-body{flex:1;min-width:0;}
 .hc-name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);}
 .habit-card.done .hc-name{color:#f0ebe0;}
-.hc-xp{font-size:13px;font-weight:800;color:rgba(255,255,255,0.18);}
-.delete-habit{background:rgba(232,64,28,0.2);border:none;border-radius:8px;padding:6px 10px;color:var(--red);font-size:12px;cursor:pointer;margin-left:5px;display:none;}
-.edit-mode .delete-habit{display:block;}
-.add-habit-btn{width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px;text-align:center;}
-.add-habit-form{background:rgba(255,255,255,0.05);border-radius:12px;padding:12px;margin-top:8px;display:none;}
-.add-habit-form.show{display:block;}
-.add-habit-form input,.add-habit-form select{width:100%;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;margin-bottom:8px;}
-.add-habit-form button{background:var(--red);border:none;border-radius:8px;padding:10px;color:#fff;font-weight:600;width:48%;margin:2px;}
+.hc-xp{font-size:13px;font-weight:800;color:rgba(255,255,255,0.18);flex-shrink:0;}
+
+/* Edit mode controls */
+.edit-controls{display:flex;gap:6px;flex-shrink:0;}
+.delete-btn{background:rgba(232,64,28,0.2);border:none;border-radius:8px;padding:6px 10px;color:var(--red);font-size:14px;cursor:pointer;}
+.rename-btn{background:rgba(255,255,255,0.08);border:none;border-radius:8px;padding:6px 10px;color:#f0ebe0;font-size:14px;cursor:pointer;}
+
+/* Add habit form */
+.add-habit-btn{width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15);border-radius:12px;color:var(--muted);font-size:13px;cursor:pointer;margin-top:4px;text-align:center;}
+.add-habit-form{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px;}
+.form-row{margin-bottom:8px;}
+.form-row label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px;font-family:monospace;letter-spacing:1px;}
+.form-input{width:100%;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:8px;padding:10px;color:#f0ebe0;font-size:13px;outline:none;}
+.form-input:focus{border-color:var(--red);}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.form-btns{display:flex;gap:8px;margin-top:4px;}
+.btn-save{flex:1;padding:10px;background:var(--red);border:none;border-radius:8px;color:white;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-cancel{flex:1;padding:10px;background:rgba(255,255,255,0.06);border:none;border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;}
+
+/* Rename modal */
+#rename-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;padding:20px;}
+#rename-modal.show{display:flex;}
+.modal-box{background:#111;border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:340px;}
+.modal-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.modal-input{width:100%;background:rgba(255,255,255,0.08);border:1px solid var(--border);border-radius:8px;padding:10px;color:#f0ebe0;font-size:14px;outline:none;margin-bottom:12px;}
+.modal-input:focus{border-color:var(--red);}
+.modal-btns{display:flex;gap:8px;}
+
+/* Notes */
 .note-box{width:100%;min-height:70px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px;color:#f0ebe0;font-size:13px;resize:none;outline:none;}
-.status-row{margin-top:12px;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;}
-.status-pct{font-size:26px;font-weight:900;}
+
+/* Week tab */
 .week-chart{display:flex;gap:6px;align-items:flex-end;height:90px;margin-bottom:8px;}
 .wc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .wc-bar{width:100%;border-radius:3px;min-height:3px;}
@@ -75,6 +108,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',He
 .hw-top{display:flex;justify-content:space-between;}
 .hw-track{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
 .hw-bar{height:100%;border-radius:2px;}
+
+/* Stats tab */
 .heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
 .hm-cell{aspect-ratio:1;border-radius:3px;}
 .streak-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;}
@@ -83,45 +118,68 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',He
 .alltime{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;}
 .at-cell{padding:12px 6px;background:#080806;text-align:center;}
 .at-num{font-size:28px;font-weight:900;color:var(--orange);}
+
+/* Finance tab */
 .fin-card{padding:12px;background:var(--card);border-radius:12px;margin-bottom:10px;}
 .fin-top{display:flex;justify-content:space-between;margin-bottom:8px;}
 .fin-val{font-size:20px;font-weight:900;}
 .fin-track{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;margin-bottom:8px;overflow:hidden;}
 .fin-fill{height:100%;border-radius:2px;}
 .fin-btns{display:flex;gap:5px;}
-.fin-btn{padding:6px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer;}
+.fin-btn{padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer;color:#f0ebe0;}
 .salary-card{background:linear-gradient(135deg,rgba(232,64,28,0.15),rgba(245,166,35,0.08));border-radius:14px;padding:14px;margin-bottom:14px;}
 .salary-num{font-size:28px;font-weight:900;}
 .salary-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;}
 .sal-box{text-align:center;padding:6px;background:rgba(0,0,0,0.2);border-radius:8px;}
+
+/* Spending tab */
 .spend-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card);border-radius:10px;margin-bottom:6px;}
 .spend-item-amt{font-size:16px;font-weight:800;}
 .add-spend-btn{width:100%;padding:10px;background:rgba(232,64,28,0.1);border:1px dashed rgba(232,64,28,0.3);border-radius:10px;color:var(--red);font-size:13px;cursor:pointer;margin-bottom:12px;}
 .form-card{background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:12px;display:none;}
 .form-card.show{display:block;}
-.form-field{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:8px;color:#fff;margin-bottom:6px;}
+.form-field{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:8px;color:#fff;margin-bottom:6px;outline:none;}
 .form-submit{width:100%;padding:10px;background:var(--red);border:none;border-radius:8px;color:white;font-weight:600;cursor:pointer;}
 .budget-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.modal-overlay{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,0.7);align-items:flex-end;}
-.modal-overlay.show{display:flex;}
-.modal-sheet{width:100%;background:#131210;border-radius:20px 20px 0 0;padding:20px;}
 .cat-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.cat-item{display:flex;align-items:center;gap:3px;}
-.cat-dot{width:5px;height:5px;border-radius:50%;}
+.cat-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);}
+.cat-dot{width:6px;height:6px;border-radius:50%;}
+
+/* Status row */
+.status-row{margin-top:12px;padding:12px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;}
+.status-pct{font-size:26px;font-weight:900;}
 </style>
 </head>
 <body>
 
 <div id="splash"><div class="splash-icon">⚡</div><div class="splash-title">EXECUTE</div></div>
-<div id="perfect" onclick="closePerfect()"><div class="perf-ico">🔥</div><div class="perf-title">PERFECT DAY</div><button class="perf-close">CLOSE</button></div>
+<div id="perfect" onclick="closePerfect()"><div class="perf-ico">🔥</div><div class="perf-title">PERFECT DAY</div><button class="perf-close" onclick="closePerfect()">CLOSE</button></div>
+
+<!-- Rename Modal -->
+<div id="rename-modal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Rename Habit</div>
+    <input type="text" class="modal-input" id="rename-input" placeholder="New habit name...">
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <input type="text" class="modal-input" id="rename-icon" placeholder="Icon emoji" style="max-width:80px;">
+      <input type="number" class="modal-input" id="rename-xp" placeholder="XP">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-save" onclick="confirmRename()">SAVE</button>
+      <button class="btn-cancel" onclick="closeRenameModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
 
 <div id="header">
   <div class="hdr-top">
     <div class="hdr-date" id="hdr-date">—</div>
-    <button id="editModeBtn" class="edit-btn" onclick="toggleEditMode()">✏️ EDIT</button>
-    <div class="radial"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="21" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/><circle id="arc" cx="25" cy="25" r="21" fill="none" stroke="#e8401c" stroke-width="4" stroke-dasharray="0 132" stroke-linecap="round"/></svg><div class="radial-center"><div class="radial-pct" id="rpct">0</div></div></div>
+    <div class="hdr-right">
+      <button id="editModeBtn" class="edit-btn" onclick="toggleEditMode()">✏️ EDIT</button>
+      <div class="radial"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="21" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/><circle id="arc" cx="25" cy="25" r="21" fill="none" stroke="#e8401c" stroke-width="4" stroke-dasharray="0 132" stroke-linecap="round"/></svg><div class="radial-center"><div class="radial-pct" id="rpct">0</div></div></div>
+    </div>
   </div>
-  <div class="xp-row"><span>XP TODAY</span><span class="xp-val" id="xpval">0</span></div>
+  <div class="xp-row"><span style="font-size:11px;color:var(--muted)">XP TODAY</span><span class="xp-val" id="xpval">0</span></div>
   <div class="xp-track"><div class="xp-fill" id="xpfill"></div></div>
 </div>
 
@@ -141,172 +199,458 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',He
   <div class="tab-pane" id="pane-spending"></div>
 </div>
 
-<div class="modal-overlay" id="edit-modal"><div class="modal-sheet"><input class="form-field" id="edit-name" placeholder="Name"><input class="form-field" id="edit-amount" type="number" placeholder="Amount"><button class="form-submit" onclick="saveEdit()">Save</button><button class="form-cancel" onclick="closeEdit()">Cancel</button></div></div>
-
 <script>
-// DEFAULT HABITS — YOU CAN DELETE ANY (LIKE GERMAN)
+// ─── Default habits ───────────────────────────────────────────────────────────
 const DEFAULT_HABITS = [
-  {id:"wake",name:"Wake by 7:30 AM",icon:"⚡",xp:10,category:"discipline"},
-  {id:"workout",name:"Workout done",icon:"💪",xp:15,category:"body"},
-  {id:"german",name:"German 90 mins",icon:"🇩🇪",xp:15,category:"german"},
-  {id:"noporn",name:"No porn",icon:"🔒",xp:20,category:"discipline"},
-  {id:"scroll",name:"Scroll under 30 min",icon:"📵",xp:10,category:"discipline"},
-  {id:"sleep",name:"Sleep by 12:15 AM",icon:"🌙",xp:10,category:"discipline"},
-  {id:"career",name:"Career block 90 min",icon:"📈",xp:15,category:"career"},
-  {id:"nodelivery",name:"No food delivery",icon:"🥗",xp:10,category:"body"},
-  {id:"reading",name:"Read 20 pages",icon:"📖",xp:5,category:"growth"},
-  {id:"walk",name:"Post-shift walk",icon:"🚶",xp:5,category:"body"}
+  {id:"wake",   name:"Wake by 7:30 AM",      icon:"⚡", xp:10, category:"discipline"},
+  {id:"workout",name:"Workout done",          icon:"💪", xp:15, category:"body"},
+  {id:"german", name:"German 90 mins",        icon:"🇩🇪",xp:15, category:"german"},
+  {id:"noporn", name:"No porn",               icon:"🔒", xp:20, category:"discipline"},
+  {id:"scroll", name:"Scroll under 30 min",   icon:"📵", xp:10, category:"discipline"},
+  {id:"sleep",  name:"Sleep by 12:15 AM",     icon:"🌙", xp:10, category:"discipline"},
+  {id:"career", name:"Career block 90 min",   icon:"📈", xp:15, category:"career"},
+  {id:"nodelivery",name:"No food delivery",   icon:"🥗", xp:10, category:"body"},
+  {id:"reading",name:"Read 20 pages",         icon:"📖", xp:5,  category:"growth"},
+  {id:"walk",   name:"Post-shift walk",        icon:"🚶", xp:5,  category:"body"}
 ];
 
-let habits = [], hist = {}, noteStore = {}, fin = {sip:0,germany:0,salary:55000}, expenses = [], curTab = "today", editMode = false, showAddHabitForm = false;
 const CAT_COLOR = {discipline:"#e8401c",body:"#2ecc71",german:"#f5a623",career:"#3498db",growth:"#9b59b6",custom:"#888"};
 
+// ─── State ────────────────────────────────────────────────────────────────────
+let habits = [], hist = {}, noteStore = {}, fin = {sip:0,germany:0,salary:55000}, expenses = [];
+let curTab = "today", editMode = false, showAddForm = false, renameTargetId = null;
+
+// ─── Storage — NO 115-day limit, keeps all data forever ──────────────────────
 function saveAll(){
-  localStorage.setItem("custom_habits", JSON.stringify(habits));
-  localStorage.setItem("ex_hist", JSON.stringify(hist));
-  localStorage.setItem("ex_notes", JSON.stringify(noteStore));
-  localStorage.setItem("ex_fin", JSON.stringify(fin));
-  localStorage.setItem("ex_expenses", JSON.stringify(expenses));
+  try {
+    localStorage.setItem("ex_habits_v2", JSON.stringify(habits));
+    localStorage.setItem("ex_hist_v2",   JSON.stringify(hist));
+    localStorage.setItem("ex_notes_v2",  JSON.stringify(noteStore));
+    localStorage.setItem("ex_fin_v2",    JSON.stringify(fin));
+    localStorage.setItem("ex_expenses_v2", JSON.stringify(expenses));
+  } catch(e){ console.warn("Storage full?", e); }
 }
 
 function loadAll(){
-  const saved = localStorage.getItem("custom_habits");
-  habits = saved ? JSON.parse(saved) : [...DEFAULT_HABITS];
-  hist = JSON.parse(localStorage.getItem("ex_hist") || "{}");
-  noteStore = JSON.parse(localStorage.getItem("ex_notes") || "{}");
-  fin = JSON.parse(localStorage.getItem("ex_fin") || '{"sip":0,"germany":0,"salary":55000}');
-  expenses = JSON.parse(localStorage.getItem("ex_expenses") || "[]");
+  // Load habits (try new key first, fall back to old)
+  const savedHabits = localStorage.getItem("ex_habits_v2") || localStorage.getItem("custom_habits");
+  habits = savedHabits ? JSON.parse(savedHabits) : [...DEFAULT_HABITS];
+
+  // Load history — migrate old limited data if exists
+  const oldHist = localStorage.getItem("ex_hist");
+  const newHist = localStorage.getItem("ex_hist_v2");
+  if(newHist){
+    hist = JSON.parse(newHist);
+  } else if(oldHist){
+    // Migrate old history without any date pruning
+    hist = JSON.parse(oldHist);
+    localStorage.setItem("ex_hist_v2", JSON.stringify(hist));
+  } else {
+    hist = {};
+  }
+
+  noteStore = JSON.parse(localStorage.getItem("ex_notes_v2") || localStorage.getItem("ex_notes") || "{}");
+  fin       = JSON.parse(localStorage.getItem("ex_fin_v2")   || localStorage.getItem("ex_fin")   || '{"sip":0,"germany":0,"salary":55000}');
+  expenses  = JSON.parse(localStorage.getItem("ex_expenses_v2") || localStorage.getItem("ex_expenses") || "[]");
 }
 
-const todayKey = () => new Date().toISOString().split("T")[0];
-const weekStart = () => { const d=new Date(), day=d.getDay(), diff=d.getDate()-day+(day===0?-6:1); return new Date(d.setDate(diff)).toISOString().split("T")[0]; };
-const addDays = (s,n) => { const d=new Date(s+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().split("T")[0]; };
-const monthKey = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; };
-const dayXP = (d) => { const h=hist[d]||{}; return habits.reduce((a,x)=>a+(h[x.id]?x.xp:0),0); };
-const maxXP = () => habits.reduce((a,h)=>a+h.xp,0);
-const dayScore = (d) => Math.round(dayXP(d)/maxXP()*100);
-const streak = (id) => { let c=0, d=new Date(todayKey()+"T12:00:00"); while(true){ const k=d.toISOString().split("T")[0]; if(hist[k] && hist[k][id]){ c++; d.setDate(d.getDate()-1); }else break; } return c; };
-const bestStreak = (id) => { let b=0,c=0; Object.keys(hist).sort().forEach(k=>{ if(hist[k]?.[id]){ c++; b=Math.max(b,c); }else c=0; }); return b; };
-const weekDays = () => Array.from({length:7},(_,i)=>addDays(weekStart(),i));
-const last14 = () => Array.from({length:14},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-13+i); return d.toISOString().split("T")[0]; });
-const thisMonthExpenses = () => { const mk=monthKey(); return expenses.filter(e=>e.date && e.date.startsWith(mk.substring(0,7))); };
-const totalSpent = () => thisMonthExpenses().reduce((a,e)=>a+Number(e.amount),0);
-const totalSaved = () => Math.max(0, fin.salary - totalSpent());
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const todayKey  = () => new Date().toISOString().split("T")[0];
+const addDays   = (s,n) => { const d=new Date(s+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().split("T")[0]; };
+const weekStart = () => { const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1); return new Date(d.setDate(diff)).toISOString().split("T")[0]; };
+const monthKey  = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; };
+const maxXP     = () => habits.reduce((a,h)=>a+h.xp,0);
+const dayXP     = (d) => { const h=hist[d]||{}; return habits.reduce((a,x)=>a+(h[x.id]?x.xp:0),0); };
+const dayScore  = (d) => { const mx=maxXP(); return mx ? Math.round(dayXP(d)/mx*100) : 0; };
+const dayDone   = (d) => { const h=hist[d]||{}; return habits.filter(x=>h[x.id]).length; };
+const weekDays  = () => Array.from({length:7},(_,i)=>addDays(weekStart(),i));
+const monthKey2 = (d) => d.substring(0,7);
+const streak    = (id) => { let c=0,d=new Date(todayKey()+"T12:00:00"); while(true){const k=d.toISOString().split("T")[0];if(hist[k]&&hist[k][id]){c++;d.setDate(d.getDate()-1);}else break;} return c; };
+const bestStreak= (id) => { let b=0,c=0; Object.keys(hist).sort().forEach(k=>{if(hist[k]?.[id]){c++;b=Math.max(b,c);}else c=0;}); return b; };
+const totalSpent= () => { const mk=monthKey(); return expenses.filter(e=>e.date&&e.date.startsWith(mk)).reduce((a,e)=>a+Number(e.amount),0); };
 
-function toggleEditMode(){ editMode = !editMode; document.getElementById("editModeBtn").classList.toggle("active", editMode); renderTab(curTab); }
-function deleteHabit(id){ if(confirm("Delete this habit?")){ habits = habits.filter(h => h.id !== id); Object.keys(hist).forEach(date => { if(hist[date][id]) delete hist[date][id]; }); saveAll(); renderTab(curTab); } }
-function showAddHabit(){ showAddHabitForm = !showAddHabitForm; renderTab(curTab); }
+// ─── Edit mode ────────────────────────────────────────────────────────────────
+function toggleEditMode(){
+  editMode = !editMode;
+  showAddForm = false;
+  document.getElementById("editModeBtn").classList.toggle("active", editMode);
+  renderTab("today");
+}
+
+function deleteHabit(id){
+  if(!confirm("Delete this habit? This cannot be undone.")) return;
+  habits = habits.filter(h=>h.id!==id);
+  saveAll(); renderTab("today");
+}
+
+function openRenameModal(id){
+  renameTargetId = id;
+  const h = habits.find(x=>x.id===id);
+  if(!h) return;
+  document.getElementById("rename-input").value = h.name;
+  document.getElementById("rename-icon").value  = h.icon;
+  document.getElementById("rename-xp").value    = h.xp;
+  document.getElementById("rename-modal").classList.add("show");
+}
+
+function closeRenameModal(){
+  document.getElementById("rename-modal").classList.remove("show");
+  renameTargetId = null;
+}
+
+function confirmRename(){
+  if(!renameTargetId) return;
+  const name = document.getElementById("rename-input").value.trim();
+  const icon = document.getElementById("rename-icon").value.trim() || "✅";
+  const xp   = parseInt(document.getElementById("rename-xp").value) || 10;
+  if(!name){ alert("Enter a name"); return; }
+  const h = habits.find(x=>x.id===renameTargetId);
+  if(h){ h.name=name; h.icon=icon; h.xp=xp; }
+  saveAll(); closeRenameModal(); renderTab("today");
+}
+
+function toggleAddForm(){
+  showAddForm = !showAddForm; renderTab("today");
+  if(showAddForm) setTimeout(()=>document.getElementById("newHabitName")?.focus(),50);
+}
+
 function addNewHabit(){
-  const name = document.getElementById("newHabitName")?.value;
-  const icon = document.getElementById("newHabitIcon")?.value || "✅";
-  const xp = parseInt(document.getElementById("newHabitXp")?.value) || 10;
+  const name     = document.getElementById("newHabitName")?.value?.trim();
+  const icon     = document.getElementById("newHabitIcon")?.value?.trim() || "✅";
+  const xp       = parseInt(document.getElementById("newHabitXp")?.value) || 10;
   const category = document.getElementById("newHabitCat")?.value || "custom";
-  if(!name){ alert("Enter habit name"); return; }
+  if(!name){ alert("Enter a habit name"); return; }
   habits.push({id:"custom_"+Date.now(), name, icon, xp, category});
-  saveAll(); showAddHabitForm = false; renderTab(curTab);
+  showAddForm = false; saveAll(); renderTab("today");
 }
-function toggleHabit(id){ if(editMode) return; const today = todayKey(); if(!hist[today]) hist[today] = {}; hist[today][id] = !hist[today][id]; saveAll(); if(dayXP(today) === maxXP()) document.getElementById("perfect").classList.add("show"); updateHeader(); renderTab(curTab); }
+
+// ─── Tracking ─────────────────────────────────────────────────────────────────
+function toggleHabit(id){
+  if(editMode) return;
+  const today = todayKey();
+  if(!hist[today]) hist[today]={};
+  hist[today][id] = !hist[today][id];
+  saveAll();
+  if(maxXP()>0 && dayXP(today)===maxXP()) document.getElementById("perfect").classList.add("show");
+  updateHeader(); renderTab("today");
+}
+
+function closePerfect(){ document.getElementById("perfect").classList.remove("show"); }
+
+// ─── Header ───────────────────────────────────────────────────────────────────
 function updateHeader(){
-  const t=todayKey(), xp=dayXP(t), score=dayScore(t), totalMax=maxXP();
+  const t=todayKey(), xp=dayXP(t), mx=maxXP(), score=dayScore(t);
   document.getElementById("hdr-date").textContent = curTab.toUpperCase();
-  document.getElementById("xpval").textContent = `${xp}/${totalMax}`;
-  document.getElementById("xpfill").style.width = totalMax ? (xp/totalMax*100)+"%" : "0%";
+  document.getElementById("xpval").textContent    = `${xp}/${mx}`;
+  document.getElementById("xpfill").style.width   = mx ? (xp/mx*100)+"%" : "0%";
   const color = score>=70?"#2ecc71":score>=40?"#f5a623":"#e8401c";
-  document.getElementById("rpct").textContent = score;
-  const circ=2*Math.PI*21; document.getElementById("arc").setAttribute("stroke-dasharray", `${circ*(score/100)} ${circ}`); document.getElementById("arc").setAttribute("stroke", color);
+  document.getElementById("rpct").textContent     = score;
+  const circ=2*Math.PI*21;
+  document.getElementById("arc").setAttribute("stroke-dasharray",`${circ*(score/100)} ${circ}`);
+  document.getElementById("arc").setAttribute("stroke",color);
 }
+
+// ─── Tab switching ────────────────────────────────────────────────────────────
 function switchTab(tab){
   document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  curTab=tab; document.getElementById("pane-"+tab).classList.add("active");
+  curTab=tab;
+  document.getElementById("pane-"+tab).classList.add("active");
   document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
-  updateHeader(); renderTab(tab);
+  updateHeader(); renderTab(tab); document.getElementById("content").scrollTop=0;
 }
+
 function renderTab(tab){
-  const el = document.getElementById("pane-"+tab);
-  if(tab==="today") el.innerHTML = buildToday();
-  else if(tab==="week") el.innerHTML = buildWeek();
-  else if(tab==="stats") el.innerHTML = buildStats();
-  else if(tab==="finance") el.innerHTML = buildFinance();
-  else if(tab==="spending") el.innerHTML = buildSpending();
-  if(tab==="today"){ const ta=document.getElementById("note-ta"); if(ta) ta.oninput = (e) => { noteStore[todayKey()]=e.target.value; saveAll(); }; }
+  const pane = document.getElementById("pane-"+tab);
+  if(tab==="today")    pane.innerHTML = buildToday();
+  else if(tab==="week")    pane.innerHTML = buildWeek();
+  else if(tab==="stats")   pane.innerHTML = buildStats();
+  else if(tab==="finance") pane.innerHTML = buildFinance();
+  else if(tab==="spending")pane.innerHTML = buildSpending();
+
+  // Wire up note textarea after render
+  if(tab==="today"){
+    const ta = document.getElementById("note-ta");
+    if(ta) ta.oninput = e => { noteStore[todayKey()]=e.target.value; saveAll(); };
+  }
 }
+
+// ─── TODAY ────────────────────────────────────────────────────────────────────
 function buildToday(){
-  const today = todayKey(), progress = hist[today] || {}, score = dayScore(today);
-  let html = `<div class="cat-legend">${Object.entries(CAT_COLOR).map(([cat,c])=>`<div class="cat-item"><div class="cat-dot" style="background:${c}"></div><span class="cat-lbl">${cat}</span></div>`).join('')}</div><div class="${editMode ? 'edit-mode' : ''}">`;
-  habits.forEach(h => { const done = !!progress[h.id], color = CAT_COLOR[h.category] || "#888";
-    html += `<div class="habit-card ${done?'done':''}" onclick="${editMode?'':'toggleHabit(\''+h.id+'\')'}">
-      <div class="hc-check" style="background:${done?color:'transparent'};border-color:${color}">${done?'✓':''}</div>
-      <span class="hc-ico">${h.icon}</span>
-      <div class="hc-body"><div class="hc-name">${h.name}</div></div>
-      <div class="hc-xp" style="color:${done?color:'rgba(255,255,255,0.18)'}">+${h.xp}</div>
-      ${editMode ? `<button class="delete-habit" onclick="event.stopPropagation();deleteHabit('${h.id}')">🗑️</button>` : ''}
+  const today=todayKey(), progress=hist[today]||{};
+  const cats = [...new Set(habits.map(h=>h.category))];
+  let html = `<div class="cat-legend">${cats.map(cat=>`<div class="cat-item"><div class="cat-dot" style="background:${CAT_COLOR[cat]||'#888'}"></div><span>${cat}</span></div>`).join('')}</div>`;
+
+  habits.forEach(h=>{
+    const done  = !!progress[h.id];
+    const color = CAT_COLOR[h.category]||"#888";
+    if(editMode){
+      html += `<div class="habit-card edit-mode-card" style="border-left-color:${color}">
+        <div class="hc-ico">${h.icon}</div>
+        <div class="hc-body"><div class="hc-name" style="color:#f0ebe0">${h.name}</div><div style="font-size:10px;color:var(--muted)">${h.xp} XP · ${h.category}</div></div>
+        <div class="edit-controls">
+          <button class="rename-btn" onclick="openRenameModal('${h.id}')">✏️</button>
+          <button class="delete-btn" onclick="deleteHabit('${h.id}')">🗑️</button>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="habit-card ${done?'done':''}" style="border-left-color:${done?color:'rgba(255,255,255,0.1)'}" onclick="toggleHabit('${h.id}')">
+        <div class="hc-check" style="${done?'background:'+color+';border-color:'+color+';color:#fff':''}"> ${done?'✓':''}</div>
+        <div class="hc-ico">${h.icon}</div>
+        <div class="hc-body"><div class="hc-name">${h.name}</div></div>
+        <div class="hc-xp">${done?'+'+h.xp+' XP':h.xp+' XP'}</div>
+      </div>`;
+    }
+  });
+
+  if(editMode){
+    html += `<button class="add-habit-btn" onclick="toggleAddForm()">＋ ADD NEW HABIT</button>`;
+    if(showAddForm){
+      html += `<div class="add-habit-form">
+        <div class="form-row"><label>HABIT NAME</label><input class="form-input" id="newHabitName" placeholder="e.g. Meditate 10 min"></div>
+        <div class="form-row-2">
+          <div><label>ICON</label><input class="form-input" id="newHabitIcon" placeholder="🏃"></div>
+          <div><label>XP</label><input class="form-input" type="number" id="newHabitXp" value="10" min="1" max="100"></div>
+        </div>
+        <div class="form-row"><label>CATEGORY</label>
+          <select class="form-input" id="newHabitCat">
+            <option value="discipline">discipline</option>
+            <option value="body">body</option>
+            <option value="career">career</option>
+            <option value="growth">growth</option>
+            <option value="german">german</option>
+            <option value="custom">custom</option>
+          </select>
+        </div>
+        <div class="form-btns">
+          <button class="btn-save" onclick="addNewHabit()">ADD HABIT</button>
+          <button class="btn-cancel" onclick="toggleAddForm()">CANCEL</button>
+        </div>
+      </div>`;
+    }
+  }
+
+  const note = noteStore[today] || "";
+  html += `<div style="margin-top:16px"><div class="sec-lbl">TODAY'S NOTE</div>
+    <textarea class="note-box" id="note-ta" placeholder="Reflections, blockers, wins...">${note}</textarea></div>`;
+
+  return html;
+}
+
+// ─── WEEK ─────────────────────────────────────────────────────────────────────
+function buildWeek(){
+  const days=weekDays(), DAY_NAMES=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+  const scores = days.map(d=>dayScore(d));
+  const maxS = Math.max(...scores,1);
+  let html = `<div class="sec-lbl">THIS WEEK</div>
+  <div class="week-chart">
+    ${days.map((d,i)=>{
+      const s=scores[i], isToday=d===todayKey();
+      const color=s>=70?"#2ecc71":s>=40?"#f5a623":"#e8401c";
+      return `<div class="wc-col">
+        <div style="font-size:10px;font-weight:700;color:${isToday?'#f0ebe0':'var(--muted)'}">${s||''}</div>
+        <div class="wc-bar" style="height:${Math.max(s/maxS*60,3)}px;background:${s?color:'rgba(255,255,255,0.07)'}"></div>
+        <div style="font-size:8px;color:${isToday?'var(--red)':'var(--muted)'};font-family:monospace">${DAY_NAMES[i]}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const avg = Math.round(scores.filter(s=>s>0).reduce((a,b)=>a+b,0)/Math.max(scores.filter(s=>s>0).length,1));
+  const best = Math.max(...scores);
+  html += `<div class="week-summary">
+    <div><div style="font-size:10px;color:var(--muted)">AVG SCORE</div><div class="ws-val">${avg||0}%</div></div>
+    <div><div style="font-size:10px;color:var(--muted)">BEST DAY</div><div class="ws-val" style="color:var(--green)">${best}%</div></div>
+    <div><div style="font-size:10px;color:var(--muted)">DAYS ACTIVE</div><div class="ws-val" style="color:var(--orange)">${scores.filter(s=>s>0).length}</div></div>
+  </div>`;
+
+  html += `<div class="sec-lbl">HABIT BREAKDOWN</div>`;
+  habits.forEach(h=>{
+    const color=CAT_COLOR[h.category]||"#888";
+    const done=days.filter(d=>hist[d]?.[h.id]).length;
+    const pct=Math.round(done/7*100);
+    html += `<div class="hw-row">
+      <div class="hw-top"><span style="font-size:12px">${h.icon} ${h.name}</span><span style="font-size:12px;color:${color}">${done}/7</span></div>
+      <div class="hw-track"><div class="hw-bar" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  });
+
+  return html;
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function buildStats(){
+  // Heatmap: last 84 days (12 weeks) — no limit
+  const cells = Array.from({length:84},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-83+i);
+    const k=d.toISOString().split("T")[0], s=dayScore(k);
+    const color=s>=80?"#2ecc71":s>=50?"#f5a623":s>=20?"#e8401c":"rgba(255,255,255,0.06)";
+    return `<div class="hm-cell" title="${k}: ${s}%" style="background:${color}"></div>`;
+  }).join('');
+
+  let html = `<div class="sec-lbl">84-DAY HEATMAP</div><div class="heatmap">${cells}</div>
+  <div style="display:flex;gap:12px;margin-bottom:16px;font-size:10px;color:var(--muted)">
+    <span>🟩 80%+</span><span>🟨 50%+</span><span>🟥 20%+</span><span>⬛ 0%</span>
+  </div>`;
+
+  html += `<div class="sec-lbl">STREAKS</div><div class="streak-grid">`;
+  habits.slice(0,4).forEach(h=>{
+    const cur=streak(h.id), best2=bestStreak(h.id);
+    html += `<div class="streak-card">
+      <div style="font-size:18px">${h.icon}</div>
+      <div style="font-size:10px;color:var(--muted);margin:4px 0">${h.name}</div>
+      <div class="sc-now" style="color:${CAT_COLOR[h.category]||'#888'}">${cur}d</div>
+      <div style="font-size:10px;color:var(--muted)">Best: ${best2}d</div>
     </div>`;
   });
   html += `</div>`;
-  if(editMode){
-    html += `<button class="add-habit-btn" onclick="showAddHabit()">+ ADD NEW HABIT</button>
-      <div class="add-habit-form ${showAddHabitForm?'show':''}">
-        <input id="newHabitName" placeholder="Habit name"><input id="newHabitIcon" placeholder="Icon" value="✅"><input id="newHabitXp" type="number" placeholder="XP" value="10">
-        <select id="newHabitCat"><option value="discipline">Discipline</option><option value="body">Body</option><option value="german">German</option><option value="career">Career</option><option value="growth">Growth</option><option value="custom">Custom</option></select>
-        <button onclick="addNewHabit()">ADD</button><button onclick="showAddHabit()">CANCEL</button>
-      </div>`;
-  }
-  html += `<textarea class="note-box" id="note-ta" placeholder="Today's note...">${noteStore[today]||""}</textarea>
-    <div class="status-row" style="background:${score>=70?'rgba(46,204,113,0.1)':'rgba(232,64,28,0.1)'}">
-      <span style="color:${score>=70?'#2ecc71':'#e8401c'}">${score>=100?'PERFECT DAY 🔥':score>=70?'ON TRACK':'GET TO WORK'}</span>
-      <span class="status-pct" style="color:${score>=70?'#2ecc71':'#e8401c'}">${score}%</span>
-    </div>`;
-  return html;
-}
-function buildWeek(){
-  const days = weekDays(), scores = days.map(dayScore), avg = Math.round(scores.reduce((a,b)=>a+b,0)/7);
-  let html = `<div class="week-chart">`;
-  days.forEach((d,i)=>{ const s=scores[i], c=s>=70?"#2ecc71":s>=40?"#f5a623":"#e8401c";
-    html += `<div class="wc-col"><div class="wc-score">${s}</div><div class="wc-bar" style="height:${Math.max(s,3)}%;background:${c}"></div><div class="wc-day">${["M","T","W","T","F","S","S"][i]}</div></div>`;
-  });
-  html += `</div><div class="week-summary"><span>WEEK AVG</span><div class="ws-val" style="color:${avg>=70?'#2ecc71':'#e8401c'}">${avg}%</div></div>`;
-  habits.forEach(h => { const cnt = days.filter(d=>hist[d]&&hist[d][h.id]).length, pct = Math.round(cnt/7*100), color = CAT_COLOR[h.category]||"#888";
-    html += `<div class="hw-row"><div class="hw-top"><span>${h.icon} ${h.name}</span><span style="color:${color}">${cnt}/7</span></div><div class="hw-track"><div class="hw-bar" style="width:${pct}%;background:${color}"></div></div></div>`;
-  });
-  return html;
-}
-function buildStats(){
-  let html = `<div class="heatmap">`; last14().forEach(d=>{ const pct=dayScore(d)/100; html+=`<div class="hm-cell" style="background:${pct>=0.9?"#2ecc71":pct>=0.7?"#27ae60":pct>=0.4?"#f5a623":pct>0?"#e8401c":"rgba(255,255,255,0.06)"}"></div>`; });
-  html += `</div><div class="streak-grid">`;
-  habits.forEach(h => { const s=streak(h.id), b=bestStreak(h.id), color=CAT_COLOR[h.category]||"#888";
-    html += `<div class="streak-card"><div class="sc-ico">${h.icon}</div><div class="sc-name">${h.name}</div><div class="sc-now" style="color:${color}">${s}</div><div>BEST: ${b}</div></div>`;
-  });
-  const allD=Object.keys(hist).length, totXP=Object.keys(hist).reduce((t,d)=>t+dayXP(d),0);
-  html += `</div><div class="alltime"><div class="at-cell"><div class="at-num">${allD}</div><div>DAYS</div></div><div class="at-cell"><div class="at-num">${totXP}</div><div>TOTAL XP</div></div></div>`;
-  return html;
-}
-function buildFinance(){
-  let html = `<div class="salary-card"><div class="salary-main"><div><div>SALARY</div><div class="salary-num">₹${fin.salary.toLocaleString()}</div></div></div><div class="fin-btns"><button class="fin-btn" onclick="adjFin('salary',5000)">+5K</button><button class="fin-btn" onclick="adjFin('salary',-5000)">-5K</button></div></div>`;
-  const items = [{key:"sip",label:"SIP",color:"#2ecc71"},{key:"germany",label:"Germany Fund",color:"#3498db"}];
-  items.forEach(it => { const v=fin[it.key]||0;
-    html += `<div class="fin-card"><div class="fin-top"><span>${it.label}</span><span class="fin-val" style="color:${it.color}">₹${v.toLocaleString()}</span></div><div class="fin-btns"><button class="fin-btn" onclick="adjFin('${it.key}',1000)">+1K</button><button class="fin-btn" onclick="adjFin('${it.key}',-1000)">-1K</button></div></div>`;
-  });
-  const budget=[["Family","₹10,000"],["Living","₹8,000"],["SIP","₹20,000"],["Germany","₹5,000"]];
-  budget.forEach(([n,a])=>html+=`<div class="budget-row"><span>${n}</span><span>${a}</span></div>`);
-  return html;
-}
-function buildSpending(){
-  const spent=totalSpent(), salary=fin.salary;
-  let html = `<div class="salary-card"><div><div>SPENT THIS MONTH</div><div class="salary-num">₹${spent.toLocaleString()}</div></div><div><div>LEFT</div><div class="salary-num">₹${(salary-spent).toLocaleString()}</div></div></div>`;
-  html += `<button class="add-spend-btn" onclick="toggleAddForm()">+ ADD EXPENSE</button><div class="form-card" id="add-form"><input class="form-field" id="new-name" placeholder="Name"><input class="form-field" id="new-amount" type="number" placeholder="Amount"><button class="form-submit" onclick="addExpense()">ADD</button></div>`;
-  thisMonthExpenses().slice().reverse().forEach(e => { html += `<div class="spend-item"><div><strong>${e.name}</strong><br><small>${e.date}</small></div><div class="spend-item-amt">₹${e.amount}</div></div>`; });
-  return html;
-}
-function toggleAddForm(){ const f=document.getElementById("add-form"); if(f) f.classList.toggle("show"); }
-function addExpense(){ const n=document.getElementById("new-name")?.value, a=document.getElementById("new-amount")?.value; if(n&&a){ expenses.push({id:Date.now(),name:n,amount:Number(a),date:todayKey()}); saveAll(); toggleAddForm(); renderTab("spending"); } }
-function adjFin(k,d){ fin[k]=Math.max(0,(fin[k]||0)+d); saveAll(); renderTab(curTab); }
-function closePerfect(){ document.getElementById("perfect").classList.remove("show"); }
-function saveEdit(){ closeEdit(); }
-function closeEdit(){ document.getElementById("edit-modal").classList.remove("show"); }
 
-loadAll(); updateHeader(); renderTab("today");
-setTimeout(()=>{ const s=document.getElementById("splash"); if(s){ s.classList.add("hide"); setTimeout(()=>s.style.display="none",500); } },1000);
+  // All-time totals using ALL stored history (no limit)
+  const allDays    = Object.keys(hist);
+  const perfectDays= allDays.filter(d=>dayScore(d)===100).length;
+  const totalXPAll = allDays.reduce((a,d)=>a+dayXP(d),0);
+  const activeDays = allDays.filter(d=>dayDone(d)>0).length;
+
+  html += `<div class="sec-lbl">ALL TIME</div>
+  <div class="alltime">
+    <div class="at-cell"><div class="at-num">${activeDays}</div><div style="font-size:9px;color:var(--muted)">DAYS ACTIVE</div></div>
+    <div class="at-cell"><div class="at-num">${perfectDays}</div><div style="font-size:9px;color:var(--muted)">PERFECT DAYS</div></div>
+    <div class="at-cell"><div class="at-num">${totalXPAll}</div><div style="font-size:9px;color:var(--muted)">TOTAL XP</div></div>
+  </div>`;
+
+  return html;
+}
+
+// ─── FINANCE ─────────────────────────────────────────────────────────────────
+function buildFinance(){
+  const sipTarget=200000, germanyTarget=500000;
+  const sipPct=Math.min(fin.sip/sipTarget*100,100), germPct=Math.min(fin.germany/germanyTarget*100,100);
+  let html = `<div class="salary-card">
+    <div style="font-size:10px;color:var(--muted)">MONTHLY SALARY</div>
+    <div class="salary-num">₹${fin.salary.toLocaleString()}</div>
+    <div class="salary-breakdown">
+      <div class="sal-box"><div style="font-size:16px;font-weight:800">₹${Math.round(fin.salary*0.5).toLocaleString()}</div><div style="font-size:9px;color:var(--muted)">NEEDS 50%</div></div>
+      <div class="sal-box"><div style="font-size:16px;font-weight:800">₹${Math.round(fin.salary*0.3).toLocaleString()}</div><div style="font-size:9px;color:var(--muted)">WANTS 30%</div></div>
+      <div class="sal-box"><div style="font-size:16px;font-weight:800">₹${Math.round(fin.salary*0.2).toLocaleString()}</div><div style="font-size:9px;color:var(--muted)">SAVE 20%</div></div>
+    </div>
+  </div>`;
+
+  html += `<div class="fin-card">
+    <div class="fin-top"><span>💰 SIP Fund</span><span class="fin-val" style="color:var(--green)">₹${fin.sip.toLocaleString()}</span></div>
+    <div class="fin-track"><div class="fin-fill" style="width:${sipPct}%;background:var(--green)"></div></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Goal: ₹${sipTarget.toLocaleString()} (${sipPct.toFixed(0)}%)</div>
+    <div class="fin-btns">
+      <button class="fin-btn" onclick="adjustFin('sip',1000)">+₹1k</button>
+      <button class="fin-btn" onclick="adjustFin('sip',5000)">+₹5k</button>
+      <button class="fin-btn" onclick="adjustFin('sip',-1000)">-₹1k</button>
+      <button class="fin-btn" onclick="promptFin('sip')">SET</button>
+    </div>
+  </div>`;
+
+  html += `<div class="fin-card">
+    <div class="fin-top"><span>✈️ Germany Fund</span><span class="fin-val" style="color:var(--blue)">₹${fin.germany.toLocaleString()}</span></div>
+    <div class="fin-track"><div class="fin-fill" style="width:${germPct}%;background:var(--blue)"></div></div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Goal: ₹${germanyTarget.toLocaleString()} (${germPct.toFixed(0)}%)</div>
+    <div class="fin-btns">
+      <button class="fin-btn" onclick="adjustFin('germany',1000)">+₹1k</button>
+      <button class="fin-btn" onclick="adjustFin('germany',5000)">+₹5k</button>
+      <button class="fin-btn" onclick="adjustFin('germany',-1000)">-₹1k</button>
+      <button class="fin-btn" onclick="promptFin('germany')">SET</button>
+    </div>
+  </div>`;
+
+  html += `<div class="fin-card">
+    <div class="fin-top"><span>💼 Salary</span><span class="fin-val">₹${fin.salary.toLocaleString()}</span></div>
+    <div class="fin-btns">
+      <button class="fin-btn" onclick="adjustFin('salary',1000)">+₹1k</button>
+      <button class="fin-btn" onclick="adjustFin('salary',-1000)">-₹1k</button>
+      <button class="fin-btn" onclick="promptFin('salary')">SET</button>
+    </div>
+  </div>`;
+
+  return html;
+}
+
+function adjustFin(key, amt){ fin[key]=Math.max(0,fin[key]+amt); saveAll(); renderTab("finance"); }
+function promptFin(key){
+  const val=prompt(`Set ${key} value (₹):`, fin[key]);
+  if(val!==null && !isNaN(parseInt(val))){ fin[key]=Math.max(0,parseInt(val)); saveAll(); renderTab("finance"); }
+}
+
+// ─── SPENDING ─────────────────────────────────────────────────────────────────
+function buildSpending(){
+  const spent=totalSpent(), saved=Math.max(0,fin.salary-spent), budget=fin.salary;
+  const pct=Math.min(spent/budget*100,100);
+
+  let html = `<div class="fin-card">
+    <div class="fin-top"><span>Month Spent</span><span class="fin-val" style="color:var(--red)">₹${spent.toLocaleString()}</span></div>
+    <div class="fin-track"><div class="fin-fill" style="width:${pct}%;background:${pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)'}"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px">
+      <span>Budget: ₹${budget.toLocaleString()}</span><span>Saved: ₹${saved.toLocaleString()}</span>
+    </div>
+  </div>`;
+
+  html += `<div id="spend-form" class="form-card">
+    <div class="sec-lbl">ADD EXPENSE</div>
+    <input class="form-field" id="spend-desc"   placeholder="Description (e.g. Lunch)">
+    <input class="form-field" id="spend-amt"    placeholder="Amount (₹)" type="number">
+    <input class="form-field" id="spend-cat"    placeholder="Category (food, travel, other)">
+    <input class="form-field" id="spend-date"   type="date" value="${todayKey()}">
+    <button class="form-submit" onclick="addExpense()">ADD EXPENSE</button>
+  </div>`;
+
+  html += `<button class="add-spend-btn" onclick="toggleSpendForm()">＋ LOG EXPENSE</button>`;
+
+  const mk = monthKey();
+  const monthExp = expenses.filter(e=>e.date&&e.date.startsWith(mk)).sort((a,b)=>b.date.localeCompare(a.date));
+
+  html += `<div class="sec-lbl">THIS MONTH (${monthExp.length} items)</div>`;
+  monthExp.forEach((e,i)=>{
+    html += `<div class="spend-item">
+      <div>
+        <div style="font-size:13px;font-weight:500">${e.desc||'—'}</div>
+        <div style="font-size:10px;color:var(--muted)">${e.date} · ${e.cat||'other'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="spend-item-amt">₹${Number(e.amount).toLocaleString()}</div>
+        <button onclick="deleteExpense(${i})" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer">✕</button>
+      </div>
+    </div>`;
+  });
+
+  if(!monthExp.length) html += `<div style="text-align:center;color:var(--muted);padding:24px;font-size:13px">No expenses this month</div>`;
+
+  return html;
+}
+
+function toggleSpendForm(){
+  const f=document.getElementById("spend-form");
+  if(f) f.classList.toggle("show");
+}
+
+function addExpense(){
+  const desc=document.getElementById("spend-desc")?.value?.trim();
+  const amt =document.getElementById("spend-amt")?.value;
+  const cat =document.getElementById("spend-cat")?.value?.trim()||"other";
+  const date=document.getElementById("spend-date")?.value||todayKey();
+  if(!desc||!amt){ alert("Enter description and amount"); return; }
+  expenses.push({desc, amount:parseFloat(amt), cat, date});
+  saveAll(); renderTab("spending");
+}
+
+function deleteExpense(idx){
+  const mk=monthKey();
+  const monthIdxs=[];
+  expenses.forEach((e,i)=>{ if(e.date&&e.date.startsWith(mk)) monthIdxs.push(i); });
+  const realIdx = monthIdxs.sort((a,b)=>expenses[b].date.localeCompare(expenses[a].date))[idx];
+  if(realIdx!==undefined){ expenses.splice(realIdx,1); saveAll(); renderTab("spending"); }
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loadAll();
+updateHeader();
+renderTab("today");
+
+setTimeout(()=>{ document.getElementById("splash").classList.add("hide"); }, 1200);
 </script>
 </body>
 </html>
